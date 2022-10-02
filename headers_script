@@ -1,0 +1,18 @@
+def split_line(crap):
+    if crap[0] == ':':
+        
+    result = {}
+    spl = crap.split(': ')
+    if len(spl) == 2:
+        result[spl[0]] = spl[1]
+    return result
+
+
+def headers(bigboy):
+    lines = bigboy.split('\n')
+    final = {}
+    for line in lines:
+        if len(line):
+            final.update(split_line(line))
+    return final
+
