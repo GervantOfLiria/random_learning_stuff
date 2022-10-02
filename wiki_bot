@@ -1,0 +1,35 @@
+from bs4 import BeautifulSoup
+import requests
+import telebot
+
+
+def get_wiki_url(wish):
+    url = 'https://ru.wikipedia.org/w/index.php?go=%D0%9F%D0%B5%D1%80%D0%B5%D0%B9%D1%82%D0%B8&search=' + wish
+    r = requests.get(url)
+    if r.url[26] == 'i':
+        return r.url
+    soup = BeautifulSoup(r.text, 'html.parser')
+    body = soup.find('body')
+    li = body.find('li', {'class': 'mw-search-result'})
+    a = li.find('a')
+    new_url = 'https://ru.wikipedia.org'+a['href']
+    return new_url
+
+
+
+
+token = '5685583956:AAF3wOZYed3apulBq_xKPKXW73VbiWfdSVE'
+bot = telebot.TeleBot(token)
+
+
+@bot.message_handler(commands=["start"])
+def start(m, res=False):
+    bot.send_message(m.chat.id, 'Что завикипедить?')
+
+
+@bot.message_handler(content_types=["text"])
+def handle_text(message):
+    bot.send_message(message.chat.id, get_wiki_url(message.text))
+
+
+bot.polling(none_stop=True, interval=1)
