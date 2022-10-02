@@ -1,0 +1,39 @@
+import requests
+import random
+import telebot
+from bs4 import BeautifulSoup
+token = '5685583956:AAF3wOZYed3apulBq_xKPKXW73VbiWfdSVE'
+bot = telebot.TeleBot(token)
+
+
+@bot.message_handler(commands = ["start"])
+def start(m, res=False):
+    bot.send_message(m.chat.id, 'По какому слову искать анек?')
+
+
+@bot.message_handler(content_types=["text"])
+def handle_text(message):
+    bot.send_message(message.chat.id, find_anecdote(message.text))
+
+
+def find_anecdote(strin):
+    url = 'https://www.anekdot.ru/search/?rubrika=j&query=' + strin
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    anecs = soup.find_all('div', {'class':'text'})
+    temp = (str(anecs).replace('<br/>', '\n').replace(', <div class="text">', '').replace('<span style="background-color:#ffff80">', '').replace('</span>', ''))
+    temp = temp.replace('</div>', '#').replace('[<div class="text">', '').replace(']','')
+    i = random.randint(0, 20)
+    result = ''
+    for symb in temp:
+        if i != 0:
+            if symb == '#':
+                i -= 1
+        else:
+            if symb == '#':
+                break
+            result += symb
+    return result
+
+
+bot.polling(none_stop=True, interval=0)
