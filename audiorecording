@@ -1,0 +1,8 @@
+import sounddevice
+from scipy.io.wavfile import write
+path = r'C:\Users\Dell\Desktop\Temp\Bottt.wav'
+fs = 44100  # Sample rate, as I understood it defines my audio quality
+seconds = 10  # Duration of recording
+myrecording = sounddevice.rec(int(seconds * fs), samplerate=fs, channels=2)
+sounddevice.wait()  # Wait until recording is finished
+write(path, fs, myrecording)  
