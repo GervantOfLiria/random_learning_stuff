@@ -1,0 +1,56 @@
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
+import json
+from bs4 import BeautifulSoup
+from selenium.webdriver.common.by import By
+result = {}
+txt_path = r'C:\Users\Dell\Desktop\Новый текстовый документ (3).txt' #a textdoc to save progress
+path = r'C:\Users\Dell\Desktop\selenium/chromedriver.exe'
+driver = webdriver.Chrome(executable_path=path)
+username = 'nyyy__takoe__' #my insta username
+password = '*********' #my insta password
+url = 'https://www.instagram.com'
+url_me = 'https://www.instagram.com/arseniyshabanov/' #the account I want to scrape the likes from
+short_codes = []
+driver.get(url)
+time.sleep(5)
+username_field = driver.find_element(By.NAME, 'username')
+password_field = driver.find_element(By.NAME, 'password')
+username_field.send_keys(username)
+password_field.send_keys(password)
+password_field.send_keys(Keys.RETURN)
+time.sleep(10)
+driver.get(url_me)
+time.sleep(10)
+elem = driver.find_element(By.TAG_NAME, 'article')
+soup = BeautifulSoup(elem.get_attribute('innerHTML'), 'lxml')
+links = soup.find_all('a', {'role': 'link'}) #Im scraping all instagram shortcodes to access every post of the chosen account
+for link in links:
+    short_codes.append(link['href'])
+for short_code in short_codes:
+    driver.get(url + short_code + 'liked_by/')
+    time.sleep(3)
+    #scrolling down the liked_by, then writing down all the text in the webpage, which consists of usernames and 'follow' buttons
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(1)
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(1)
+    elem = driver.find_element(By.TAG_NAME, 'main')
+    strings = elem.text
+    strings = strings.replace('\nПодписки', '').replace('\nПодписаться', '').split('\n')
+    for string in strings:
+        try:
+            result[string] += 1
+        except KeyError:
+            result[string] = 1
+    with open(txt_path, 'wt', encoding='utf8') as json_file:
+        json.dump(result, json_file, ensure_ascii=False) #saving progress
+time.sleep(60)
+driver.quit()
