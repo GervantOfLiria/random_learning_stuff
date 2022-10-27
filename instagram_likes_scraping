@@ -31,17 +31,15 @@ for link in links:
 for short_code in short_codes:
     driver.get(url + short_code + 'liked_by/')
     time.sleep(3)
-    #scrolling down the liked_by, then writing down all the text in the webpage, which consists of usernames and 'follow' buttons
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(1)
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(1)
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(1)
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(1)
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(1)
+    #scrolling down the liked_by page
+        while True:
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(1)
+        new_height = driver.execute_script("return document.body.scrollHeight")
+        if new_height == last_height:
+            break
+        last_height = new_height
+    #then writing down all the text in the webpage, which consists of usernames and 'follow' buttons
     elem = driver.find_element(By.TAG_NAME, 'main')
     strings = elem.text
     strings = strings.replace('\nПодписки', '').replace('\nПодписаться', '').split('\n')
